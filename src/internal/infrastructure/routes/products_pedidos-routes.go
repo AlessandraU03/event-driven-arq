@@ -8,7 +8,6 @@ import (
 	"eventdriven/src/internal/infrastructure/controllers"
 	"github.com/gin-gonic/gin"
 	"log"
-	"time"
 	"github.com/gin-contrib/cors"
 
 )
@@ -19,12 +18,11 @@ func RegisterPedidosRoutes(router *gin.Engine) {
 	dpFoods := adapters.NewMySQLFoods()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://13.217.156.220"}, 
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type"},
+		AllowOrigins:     []string{"*"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
 	}))
 
 	ByIdFoodUseCase := products.NewByIdFoodUseCase(dpFoods)
