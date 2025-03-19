@@ -5,16 +5,28 @@ import (
 	"eventdriven/src/internal/domain/repositories"
 )
 
-
-
 type CreateOrderUseCase struct {
-	orderRepository repositories.IPedido
-} 
-
-func NewCreateOrderUseCase(orderRepository repositories.IPedido) *CreateOrderUseCase {
-	return &CreateOrderUseCase{orderRepository: orderRepository}
+	repo               repositories.IPedido
+	notificationService repositories.NotificationPort
 }
 
-func (useCase *CreateOrderUseCase) Execute(pedido *entities.Pedido) {
-	useCase.orderRepository.Save(pedido)
+func NewCreateOrderUseCase(repo repositories.IPedido, notificationService repositories.NotificationPort) *CreateOrderUseCase {
+	return &CreateOrderUseCase{
+		repo:               repo,
+		notificationService: notificationService,
+	}
+}
+
+func (uc *CreateOrderUseCase) Execute(pedido *entities.Pedido) (int, error) {
+	err := uc.repo.Save(pedido)
+	if err != nil {
+		return 0, err
+	}
+
+	err = uc.notificationService.NotifyPedidoCreation(pedido)
+	if err != nil {
+		return 0, err
+	}
+
+	return pedido.ID, nil
 }

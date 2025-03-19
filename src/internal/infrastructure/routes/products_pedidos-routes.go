@@ -28,8 +28,8 @@ func RegisterPedidosRoutes(router *gin.Engine) {
 	ByIdFoodUseCase := products.NewByIdFoodUseCase(dpFoods)
 	CreateFoodUseCase := products.NewCreateFoodUseCase(dpFoods)
 	ListFoodUseCase := products.NewListFoodUseCase(dpFoods)
+	DeleteFoodUseCase := products.NewDeleteFoodUseCase(dpFoods)
 
-	CreateOrderUseCase := useCases.NewCreateOrderUseCase(dbPedidos)
 
 	rabbitAdapter, err := adapters.NewRabbitMQAdapter()
 	if err != nil {
@@ -37,14 +37,17 @@ func RegisterPedidosRoutes(router *gin.Engine) {
 	}
 
 	notificationService := services.NewNotificationService(rabbitAdapter)
+	CreateOrderUseCase := useCases.NewCreateOrderUseCase(dbPedidos, notificationService)
+	CreatePedidoController := controllers.NewCreatePedidoController(CreateOrderUseCase)
 
-	CreatePedidoController := controllers.NewCreatePedidoController(CreateOrderUseCase, notificationService)
+
 	CreateFoodController := controllers.NewCreateFoodController(CreateFoodUseCase)
 	byIdFoodController := controllers.NewByIdFoodController(ByIdFoodUseCase)
    ListFoodController := controllers.NewListFoodController(ListFoodUseCase)
+   DeleteFoodController := controllers.NewDeleteFoodController(DeleteFoodUseCase)
 
-	router.POST("/pedidos", CreatePedidoController.Execute)
-	
+   router.POST("/pedidos", CreatePedidoController.Execute)
+	router.DELETE("/foods/:producto_id", DeleteFoodController.Execute)
 	router.POST("/foods", CreateFoodController.Execute)
 	router.GET("/foods/:producto_id", byIdFoodController.Execute)
 	router.GET("/foods", ListFoodController.Execute)

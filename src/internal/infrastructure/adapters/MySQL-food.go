@@ -73,7 +73,7 @@ func (mysql *MySQLFoods) Update(food *entities.Food) error {
 	return nil
 }
 
-func (mysql *MySQLFoods) Delete(FoodID int32) error {
+func (mysql *MySQLFoods) Delete(FoodID int32) error { 
 	query := "DELETE FROM productos WHERE producto_id = ?"
 	_, err := mysql.conn.ExecutePreparedQuery(query, FoodID)
 	if err != nil {
@@ -81,7 +81,6 @@ func (mysql *MySQLFoods) Delete(FoodID int32) error {
 	}
 	return nil
 }
-
 
 func (mysql *MySQLFoods) GetById(FoodID int32) ([]*entities.Food, error) {
     query := "SELECT producto_id, nombre, descripcion, precio FROM productos WHERE producto_id = ?"
